@@ -1,6 +1,12 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
+#include <string>
+#include <map>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include "globals.h"
+
 struct SDL_Window;
 struct SDL_Renderer;
 
@@ -8,18 +14,70 @@ class Graphics {
 	public:
 		Graphics();
 		~Graphics();
+	
+	/* SDL_Surface* loadImage
+	 * Loads an image into the _spriteSheets map if it doesn't already exist.
+	 * As a result, each image will only ever be loaded once
+	 * Returns the image from the map regardless of whether or not it was just loaded
+	 */
+	SDL_Surface* loadImage(const std::string &filePath);
+
+	/* void blitSurface
+	 * Draws a texture to a certain part of the screen
+	 */
+	void blitSurface(SDL_Texture* source, SDL_Rect* sourceRectangle, SDL_Rect* destinationRectangle);
+
+	/* void flip
+	 * Renders everything to the screen
+	 */
+	void flip();
+
+	/* void clear
+	 * Clears the screen
+	 */
+	void clear();
+
+	/* SDL_Renderer* getRenderer
+	 * Returns the renderer
+	 */
+	SDL_Renderer* getRenderer() const;
+
 	private:
 		SDL_Window* _window;
 		SDL_Renderer* _renderer;
+
+		std::map<std::string, SDL_Surface*> _spriteSheets;
 };
 
 Graphics::Graphics() {
-		SDL_CreateWindowAndRenderer(640, 480, 0, &this->_window, &this->_renderer);
-			SDL_SetWindowTitle(this->_window, "SDL TEMPLATE");
+	SDL_CreateWindowAndRenderer(globals::SCREEN_WIDTH, globals::SCREEN_HEIGHT, 0, &this->_window, &this->_renderer);
+	SDL_SetWindowTitle(this->_window, "SDL Project Template");
 }
 
 Graphics::~Graphics() {
-		SDL_DestroyWindow(this->_window);
+	SDL_DestroyWindow(this->_window);
 }
 
+SDL_Surface* Graphics::loadImage(const std::string &filePath) {
+	if (this->_spriteSheets.count(filePath) == 0) {
+		this->_spriteSheets[filePath] = IMG_Load(filePath.c_str());
+	}
+	return this->_spriteSheets[filePath];
+}
+
+void Graphics::blitSurface(SDL_Texture* texture, SDL_Rect* sourceRectangle, SDL_Rect* destinationRectangle) {
+	SDL_RenderCopy(this->_renderer, texture, sourceRectangle, destinationRectangle);
+}
+
+void Graphics::flip() {
+	SDL_RenderPresent(this->_renderer);
+}
+
+void Graphics::clear() {
+	SDL_RenderClear(this->_renderer);
+}
+
+SDL_Renderer* Graphics::getRenderer() const {
+	return this->_renderer;
+}
 #endif
