@@ -39,19 +39,26 @@ Sprite::Sprite(Graphics &graphics, const std::string &filePath, int sourceX,
 	
 	this->_spriteSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage(filePath));
 	if (this->_spriteSheet == NULL) {
-		printf("\nError: Unable to load image\n");
+		logSDLError("CreateTextureFromSurface");	
 	}
 
 }
 
-Sprite::~Sprite() {}
+Sprite::~Sprite() 
+{
+	
+}
 
-void Sprite::draw(Graphics &graphics, int x, int y) {
+void Sprite::draw(Graphics &graphics, int x, int y) 
+{
 	SDL_Rect destinationRectangle = { x, y, this->_sourceRect.w * globals::SPRITE_SCALE,
 	this->_sourceRect.h * globals::SPRITE_SCALE };
 	graphics.blitSurface(this->_spriteSheet, &this->_sourceRect, &destinationRectangle);
 }
 
-void Sprite::update() {}
+void Sprite::update() 
+{
+
+}
 
 #endif
